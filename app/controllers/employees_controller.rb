@@ -1,5 +1,5 @@
 class EmployeesController < ApplicationController
-  protect_from_forgery with: :null_session
+  skip_before_action :authorize_request, only: [:create]
 
   # GET /employees
   def index
@@ -8,8 +8,13 @@ class EmployeesController < ApplicationController
 
   # POST /employees
   def create
-    employee = Employee.create(employee_params)
-    render json: employee
+    employee = Employee.new(employee_params)
+
+    if employee.save
+      render json: employee, status: :created
+    else
+      render json: employee.errors, status: :unprocessable_entity
+    end
   end
 
   # GET /employees/:id
@@ -21,8 +26,12 @@ class EmployeesController < ApplicationController
   # PUT /employees/:id
   def update
     employee = Employee.find(params[:id])
-    employee.update(employee_params)
-    render json: employee
+
+    if employee.update(employee_params)
+      render json: employee
+    else
+      render json: employee.errors, status: :unprocessable_entity
+    end
   end
 
   # DELETE /employees/:id
@@ -35,6 +44,6 @@ class EmployeesController < ApplicationController
   private
 
   def employee_params
-    params.require(:employee).permit(:name, :position)
+    params.require(:employee).permit(:name, :email, :password, :password_confirmation, :position)
   end
 end

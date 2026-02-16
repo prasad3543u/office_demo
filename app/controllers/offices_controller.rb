@@ -1,6 +1,5 @@
 class OfficesController < ApplicationController
-  protect_from_forgery with: :null_session
-
+ 
   # ✅ GET /offices
   def index
     offices = Office.all

@@ -1,7 +1,21 @@
-class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+class ApplicationController < ActionController::API
+  before_action :authorize_request
 
-  # Changes to the importmap will invalidate the etag for HTML responses
-  stale_when_importmap_changes
+  private
+
+  def authorize_request
+    header = request.headers['Authorization']
+    
+    if header
+      token = header.split(' ').last
+      begin
+        decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+        @current_user = Employee.find(decoded["employee_id"])
+      rescue
+        render json: { error: "Unauthorized" }, status: :unauthorized
+      end
+    else
+      render json: { error: "Token missing" }, status: :unauthorized
+    end
+  end
 end
