@@ -10,9 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_09_100722) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_16_064736) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "employees", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.string "position"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "office_employees", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "employee_id", null: false
+    t.bigint "office_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["employee_id"], name: "index_office_employees_on_employee_id"
+    t.index ["office_id"], name: "index_office_employees_on_office_id"
+  end
 
   create_table "offices", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -20,4 +36,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_100722) do
     t.string "name"
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "office_employees", "employees"
+  add_foreign_key "office_employees", "offices"
 end
